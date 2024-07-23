@@ -1,15 +1,17 @@
 const cs = {};
 
 class PaidStorageRepository {
-  constructor(db, pgp) {
+  constructor(logger, db, pgp) {
+    this.logger = logger;
     this.db = db;
     this.pgp = pgp;
     createColumnsets(pgp);
   }
 
   async insert(data) {
-    const insert = this.pgp.helpers.insert(data, cs);
-    await this.db.none(insert);
+    this.logger.info("insert");
+    // const insert = this.pgp.helpers.insert(data, cs);
+    // await this.db.none(insert);
   }
 
   async create() {}
