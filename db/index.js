@@ -3,7 +3,7 @@ const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER } = require("../config");
 const { Users, Products } = require("./repos");
 
 const initOptions = {
-  extend(obj, dc) {
+  extend(obj) {
     obj.users = new Users(obj, pgp);
     obj.products = new Products(obj, pgp);
   },
