@@ -4,7 +4,7 @@ const apis = require("./api");
 const config = require("./config");
 const logger = require("./utils/logger");
 
-const start = () => {
+const start = async () => {
   Object.keys(apis).map(async (api) => {
     const instance = new apis[api](logger, config);
 
