@@ -4,7 +4,8 @@ const {
   DB_DATABASE,
   DB_USER,
   API_KEY,
-  API_BASE_URL = "https://seller-analytics-api.wildberries.ru",
+  DB_PASS,
+  API_BASE_URL = "https://seller-analytics-api.wildberries.ru/api/",
 } = process.env;
 
 const config = {
@@ -12,6 +13,7 @@ const config = {
   DB_PORT,
   DB_DATABASE,
   DB_USER,
+  DB_PASS,
   API_KEY,
   API_BASE_URL,
 };

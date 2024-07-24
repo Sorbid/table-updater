@@ -9,9 +9,9 @@ class PaidStorageRepository {
   }
 
   async insert(data) {
-    this.logger.info("insert");
-    // const insert = this.pgp.helpers.insert(data, cs);
-    // await this.db.none(insert);
+    this.logger.debug("insert");
+    const insert = this.pgp.helpers.insert(data, cs);
+    await this.db.none(insert);
   }
 
   async create() {}

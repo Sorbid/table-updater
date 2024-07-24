@@ -1,5 +1,11 @@
 const pgPromise = require("pg-promise");
-const { DB_HOST, DB_PORT, DB_DATABASE, DB_USER } = require("../config");
+const {
+  DB_HOST,
+  DB_PORT,
+  DB_DATABASE,
+  DB_USER,
+  DB_PASS,
+} = require("../config");
 const repos = require("./repos");
 const logger = require("../utils/logger");
 
@@ -18,6 +24,7 @@ const db = pgp({
   port: DB_PORT,
   database: DB_DATABASE,
   user: DB_USER,
+  password: DB_PASS,
 });
 
 module.exports = { db, pgp };
