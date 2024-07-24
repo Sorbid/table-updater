@@ -11,10 +11,12 @@ class PaidStorage extends Api {
   async createReport(dateFrom, dateTo) {
     this.logger.debug("createReport");
     const reply = await super.get("/v1/paid_storage", {
-      dateFrom,
-      dateTo,
+      params: {
+        dateFrom: dateFrom.toJSON(),
+        dateTo: dateTo.toJSON(),
+      },
     });
-    this.taskId = reply.data.taskId;
+    this.taskId = reply.data.data.taskId;
   }
 
   async checkReport() {
@@ -22,7 +24,7 @@ class PaidStorage extends Api {
     const reply = await super.get(
       `/v1/paid_storage/tasks/${this.taskId}/status`
     );
-    return reply.data.status === "done";
+    return reply.data.data.status === "done";
   }
 
   async getReport() {
@@ -36,12 +38,24 @@ class PaidStorage extends Api {
 
   async start() {
     const currentDate = new Date();
-    const yesterday = currentDate.getTime() - 24 * 60 * 60 * 1000;
+    const yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
     await this.createReport(yesterday, currentDate);
     while (!(await this.checkReport())) {
       await timeout(30 * 1000);
     }
-    return await this.getReport();
+    const data = await this.getReport();
+
+    return this.parseData(data);
+  }
+
+  parseData(data) {
+    return data.map((item) => {
+      item.tariffFixDate =
+        item.tariffFixDate == "" ? undefined : item.tariffFixDate;
+      item.tariffLowerDate =
+        item.tariffLowerDate == "" ? undefined : item.tariffLowerDate;
+      return item;
+    });
   }
 }
 

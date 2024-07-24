@@ -1,6 +1,6 @@
 {
   "name": "get-paid-storage",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Get paid storage from WB",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.2",
+    "axios-retry": "^4.4.2",
     "dotenv": "^16.4.5",
     "pg-promise": "^11.9.1",
     "pino": "^9.3.1"
