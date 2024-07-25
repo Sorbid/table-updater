@@ -36,10 +36,8 @@ class PaidStorage extends Api {
     return reply.data;
   }
 
-  async start() {
-    const currentDate = new Date();
-    const yesterday = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-    await this.createReport(yesterday, currentDate);
+  async start(dateFrom, dateTo) {
+    await this.createReport(dateFrom, dateTo);
     while (!(await this.checkReport())) {
       await timeout(30 * 1000);
     }
