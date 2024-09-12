@@ -1,5 +1,5 @@
 function getStartOfJuly(year) {
-  return new Date(year, 6, 1); // Month is zero-based in JavaScript (0 for January, 1 for February, etc.)
+  return new Date(year, 3, 7); // Month is zero-based in JavaScript (0 for January, 1 for February, etc.)
 }
 
 function addDays(date, days) {
@@ -24,7 +24,7 @@ function groupByWeek(dates) {
 
   while (weekStart <= dates[dates.length - 1]) {
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6); // Assuming weeks start on Sunday, adjust as needed
+    weekEnd.setDate(weekStart.getDate() + 3); // Assuming weeks start on Sunday, adjust as needed
 
     weeks.push({
       start: new Date(weekStart),
@@ -32,7 +32,7 @@ function groupByWeek(dates) {
     });
 
     // Move to the next week
-    weekStart.setDate(weekStart.getDate() + 7);
+    weekStart.setDate(weekStart.getDate() + 4);
   }
   return weeks;
 }
@@ -40,7 +40,7 @@ function groupByWeek(dates) {
 // Example usage for this year
 const startYear = new Date().getFullYear();
 const startOfJuly = getStartOfJuly(startYear);
-const today = new Date();
+const today = new Date(2024, 5, 29);
 
 const datesInRange = getDatesInRange(startOfJuly, today);
 const groupedByWeek = groupByWeek(datesInRange);

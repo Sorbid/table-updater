@@ -17,7 +17,10 @@ class Api {
     this.api = axios.create(opts);
     axiosRetry(this.api, {
       retries: 3,
-      retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: () => true, // Retry all errors
+      retryDelay: () => {
+        return 61 * 1000;
+      },
     });
   }
 
@@ -29,7 +32,14 @@ class Api {
     }
   }
 
-  async post() {}
+  async post(route, body, opts) {
+    try {
+      return await this.api.post(route, body, opts);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Api;

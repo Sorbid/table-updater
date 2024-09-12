@@ -3,7 +3,10 @@ const timeout = require("../../utils/timeout");
 
 class PaidStorage extends Api {
   constructor(logger, config) {
-    super(logger, config);
+    super(logger, {
+      API_BASE_URL: config.SELLER_ANALYTICS_URL,
+      API_KEY: config.API_KEY,
+    });
     this.logger = logger;
     this.taskId = undefined;
   }
