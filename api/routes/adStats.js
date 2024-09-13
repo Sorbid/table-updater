@@ -2,11 +2,8 @@ const Api = require("../api");
 const timeout = require("../../utils/timeout");
 
 class AdStats extends Api {
-  constructor(logger, config) {
-    super(logger, {
-      API_BASE_URL: config.AD_URL,
-      API_KEY: config.API_KEY,
-    });
+  constructor({ logger, config, db }) {
+    super({ logger, API_BASE_URL: config.AD_URL, API_KEY: config.API_KEY });
     this.logger = logger;
     this.adType = {
       4: "кампания в каталоге",
@@ -16,6 +13,7 @@ class AdStats extends Api {
       8: "автоматическая кампания",
       9: "поиск + каталог",
     };
+    this.db = db[AdStats.name];
   }
 
   async getAllAdverts() {
@@ -68,7 +66,7 @@ class AdStats extends Api {
       await timeout(61 * 1000);
     }
 
-    return this.parseResult(result);
+    await this.db.insert(this.parseResult(result));
   }
 
   parseResult(res) {

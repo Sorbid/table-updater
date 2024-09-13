@@ -2,7 +2,7 @@ const axiosRetry = require("axios-retry").default;
 const axios = require("axios");
 
 class Api {
-  constructor(logger, { API_BASE_URL, API_KEY }) {
+  constructor({ logger, API_BASE_URL, API_KEY }) {
     this.logger = logger;
     const opts = {
       baseURL: API_BASE_URL,
@@ -26,17 +26,22 @@ class Api {
 
   async get(route, opts = {}) {
     try {
+      this.logger.debug(`Выполнение get запроса: ${route}, ${opts}`);
       return await this.api.get(route, opts);
     } catch (error) {
+      this.logger.error("Произошла ошибка при обращении в API (get): " + error);
       throw error;
     }
   }
 
   async post(route, body, opts) {
     try {
+      this.logger.debug(`Выполнение post запроса: ${route}, ${body}, ${opts}`);
       return await this.api.post(route, body, opts);
     } catch (error) {
-      console.log(error);
+      this.logger.error(
+        "Произошла ошибка при обращении в API (post): " + error
+      );
       throw error;
     }
   }

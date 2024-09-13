@@ -2,13 +2,15 @@ const Api = require("../api");
 const timeout = require("../../utils/timeout");
 
 class PaidStorage extends Api {
-  constructor(logger, config) {
-    super(logger, {
+  constructor({ logger, config, db }) {
+    super({
+      logger,
       API_BASE_URL: config.SELLER_ANALYTICS_URL,
       API_KEY: config.API_KEY,
     });
     this.logger = logger;
     this.taskId = undefined;
+    this.db = db.PaidStorage;
   }
 
   async createReport(dateFrom, dateTo) {
@@ -39,22 +41,30 @@ class PaidStorage extends Api {
     return reply.data;
   }
 
-  async start(dateFrom, dateTo) {
-    await this.createReport(dateFrom, dateTo);
+  async start({ stardDate, endDate }) {
+    this.logger.info("Начало обновления paidStorage");
+
+    await this.createReport(stardDate, endDate);
+
     while (!(await this.checkReport())) {
       await timeout(30 * 1000);
     }
     const data = await this.getReport();
 
-    return this.parseData(data);
+    this.logger.info("Обновление paidStorage успешно завершено");
+
+    await this.insertData(this.parseData(data));
+  }
+
+  async insertData(data) {
+    this.logger.debug("insertData");
+    await this.db.insert(data);
   }
 
   parseData(data) {
     return data.map((item) => {
-      item.tariffFixDate =
-        item.tariffFixDate == "" ? undefined : item.tariffFixDate;
-      item.tariffLowerDate =
-        item.tariffLowerDate == "" ? undefined : item.tariffLowerDate;
+      item.tariffFixDate = item.tariffFixDate || undefined;
+      item.tariffLowerDate = item.tariffLowerDate || undefined;
       return item;
     });
   }
