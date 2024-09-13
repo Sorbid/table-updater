@@ -1,5 +1,5 @@
 function getStartOfJuly(year) {
-  return new Date(year, 6, 1); // Month is zero-based in JavaScript (0 for January, 1 for February, etc.)
+  return new Date(Date.UTC(year, 6, 1)); // Month is zero-based in JavaScript (0 for January, 1 for February, etc.)
 }
 
 function addDays(date, days) {
@@ -45,4 +45,6 @@ const today = new Date();
 const datesInRange = getDatesInRange(startOfJuly, today);
 const groupedByWeek = groupByWeek(datesInRange);
 
-module.exports = groupedByWeek;
+// module.exports = groupedByWeek;
+
+console.log(groupedByWeek);
