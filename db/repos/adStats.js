@@ -1,17 +1,17 @@
+const Repository = require("../repository");
+
 const cs = {};
 
-class AdStatsRepository {
-  constructor(logger, db, pgp) {
+class AdStatsRepository extends Repository {
+  constructor({ logger, db, pgp }) {
+    super({ logger, db, pgp });
     this.logger = logger;
-    this.db = db;
-    this.pgp = pgp;
     createColumnsets(pgp);
   }
 
   async insert(data) {
-    this.logger.debug("insert");
-    const insert = this.pgp.helpers.insert(data, cs.insert);
-    await this.db.none(insert);
+    this.logger.debug("insert adStats");
+    await super.insert({ data, cs });
   }
 
   async create() {}
