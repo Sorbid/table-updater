@@ -17,7 +17,9 @@ class Api {
     this.api = axios.create(opts);
     axiosRetry(this.api, {
       retries: 3,
-      retryCondition: () => true, // Retry all errors
+      retryCondition: (error) => {
+        console.log(error);
+      }, // Retry all errors
       retryDelay: () => {
         return 61 * 1000;
       },
@@ -26,7 +28,11 @@ class Api {
 
   async get(route, opts = {}) {
     try {
-      this.logger.debug(`Выполнение get запроса: ${route}, ${opts}`);
+      this.logger.debug(
+        `Выполнение get запроса: ${JSON.stringify(route)}, ${JSON.stringify(
+          opts
+        )}`
+      );
       return await this.api.get(route, opts);
     } catch (error) {
       this.logger.error("Произошла ошибка при обращении в API (get): " + error);
@@ -36,7 +42,11 @@ class Api {
 
   async post(route, body, opts) {
     try {
-      this.logger.debug(`Выполнение post запроса: ${route}, ${body}, ${opts}`);
+      this.logger.debug(
+        `Выполнение post запроса: ${JSON.stringify(route)}, ${JSON.stringify(
+          body
+        )}, ${JSON.stringify(opts)}`
+      );
       return await this.api.post(route, body, opts);
     } catch (error) {
       this.logger.error(

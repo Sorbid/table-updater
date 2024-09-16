@@ -12,7 +12,7 @@ const logger = require("../utils/logger");
 const initOptions = {
   extend(obj) {
     Object.keys(repos).map(
-      (repo) => (obj[repo] = new repos[repo]({ logger, obj, pgp }))
+      (repo) => (obj[repo] = new repos[repo]({ logger, db: obj, pgp }))
     );
   },
 };

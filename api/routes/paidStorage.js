@@ -10,7 +10,7 @@ class PaidStorage extends Api {
     });
     this.logger = logger;
     this.taskId = undefined;
-    this.db = db.PaidStorage;
+    this.db = db.db.PaidStorage;
   }
 
   async createReport(dateFrom, dateTo) {
@@ -41,19 +41,19 @@ class PaidStorage extends Api {
     return reply.data;
   }
 
-  async start({ stardDate, endDate }) {
+  async start({ startDate, endDate }) {
     this.logger.info("Начало обновления paidStorage");
 
-    await this.createReport(stardDate, endDate);
+    await this.createReport(startDate, endDate);
 
     while (!(await this.checkReport())) {
       await timeout(30 * 1000);
     }
     const data = await this.getReport();
 
-    this.logger.info("Обновление paidStorage успешно завершено");
-
     await this.insertData(this.parseData(data));
+
+    this.logger.info("Обновление paidStorage успешно завершено");
   }
 
   async insertData(data) {

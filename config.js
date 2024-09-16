@@ -19,6 +19,7 @@ const config = {
   DB_USER,
   DB_PASS,
   API_KEY,
+  LOG_LEVEL: "debug",
   SELLER_ANALYTICS_URL: "https://seller-analytics-api.wildberries.ru/api/",
   AD_URL: "https://advert-api.wildberries.ru",
   endDate: new Date(END_DATE) || currentDate,

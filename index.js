@@ -2,22 +2,24 @@ require("dotenv").config();
 const apis = require("./api");
 const config = require("./config");
 const logger = require("./utils/logger");
+const db = require("./db");
 // const dates = require("./utils/dates");
 
 const start = async () => {
   Object.keys(apis).map(async (api) => {
-    const instance = new apis[api](logger, config);
-    const dates = [
-      {
-        start: new Date("2024-07-27T00:00:00.000Z"),
-        end: new Date("2024-07-29T00:00:00.000Z"),
-      },
-    ];
+    const instance = new apis[api]({ logger, config, db });
+    const dates = {
+      startDate: new Date(Date.UTC(2024, 8, 9)),
+      endDate: new Date(Date.UTC(2024, 8, 12)),
+    };
     console.log(dates);
-    for (const date of dates) {
-      const data = await instance.start(date.start, date.end);
-      await db[api].insert(data);
-    }
+    // for (const date of dates) {
+    const data = await instance.start({
+      startDate: dates.startDate,
+      endDate: dates.endDate,
+    });
+    // await db[api].insert(data);
+    // }
   });
 };
 
