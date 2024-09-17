@@ -10,15 +10,15 @@ class PaidStorage extends Api {
     });
     this.logger = logger;
     this.taskId = undefined;
-    this.db = db.db.PaidStorage;
+    this.db = db.PaidStorage;
   }
 
   async createReport(dateFrom, dateTo) {
     this.logger.debug("createReport");
     const reply = await super.get("/v1/paid_storage", {
       params: {
-        dateFrom: dateFrom.toJSON(),
-        dateTo: dateTo.toJSON(),
+        dateFrom: dateFrom,
+        dateTo: dateTo,
       },
     });
     this.taskId = reply.data.data.taskId;

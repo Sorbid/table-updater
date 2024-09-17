@@ -13,8 +13,6 @@ class AdStatsRepository extends Repository {
     this.logger.debug("insert adStats");
     await super.insert({ data, cs });
   }
-
-  async create() {}
 }
 
 function createColumnsets(pgp) {

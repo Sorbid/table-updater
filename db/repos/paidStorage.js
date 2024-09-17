@@ -13,8 +13,6 @@ class PaidStorageRepository extends Repository {
     this.logger.debug("insert paidStorage");
     await super.insert({ data, cs });
   }
-
-  async create() {}
 }
 
 function createColumnsets(pgp) {

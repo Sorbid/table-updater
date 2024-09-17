@@ -13,7 +13,7 @@ class AdStats extends Api {
       8: "автоматическая кампания",
       9: "поиск + каталог",
     };
-    this.db = db[AdStats.name];
+    this.db = db.AdStats;
   }
 
   async getAllAdverts() {
