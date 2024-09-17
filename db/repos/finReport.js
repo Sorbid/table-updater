@@ -7,6 +7,7 @@ class FinReportRepository extends Repository {
     super({ logger, db, pgp });
     this.logger = logger;
     createColumnsets(pgp);
+    this.queries = [];
   }
 
   async insert(data) {
@@ -14,7 +15,13 @@ class FinReportRepository extends Repository {
     await super.insert({ data, cs });
   }
 
-  async create() {}
+  addQuery({ data }) {
+    this.queries.push(super.createInsertQuery({ data, cs }));
+  }
+
+  async runQueries() {
+    await Promise.all(this.queries.map((sql) => super.rawInsert({ sql })));
+  }
 }
 
 function createColumnsets(pgp) {
@@ -77,14 +84,14 @@ function createColumnsets(pgp) {
         { name: "ppvz_supplier_name" },
         { name: "ppvz_inn" },
         { name: "declaration_number" },
-        { name: "bonus_type_name" },
+        { name: "bonus_type_name", def: null },
         { name: "sticker_id" },
         { name: "site_country" },
         { name: "penalty" },
         { name: "additional_payment" },
         { name: "rebill_logistic_cost" },
-        { name: "rebill_logistic_org" },
-        { name: "kiz" },
+        { name: "rebill_logistic_org", def: null },
+        { name: "kiz", def: null },
         { name: "storage_fee" },
         { name: "deduction" },
         { name: "acceptance" },
