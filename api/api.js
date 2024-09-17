@@ -1,5 +1,5 @@
-const axiosRetry = require("axios-retry").default;
 const axios = require("axios");
+const axiosRetry = require("axios-retry").default;
 
 class Api {
   constructor({ logger, API_BASE_URL, API_KEY }) {
@@ -16,12 +16,13 @@ class Api {
     };
     this.api = axios.create(opts);
     axiosRetry(this.api, {
-      retries: 3,
-      retryCondition: (error) => {
-        console.log(error);
-      }, // Retry all errors
-      retryDelay: () => {
-        return 61 * 1000;
+      retries: 0,
+      // retryCondition: (error) => true,
+      retryDelay: (retryCount) => {
+        return retryCount * 10000;
+      },
+      onRetry: (retryCount, err, conf) => {
+        logger.info(`retry req: ${conf.url}, count: ${retryCount}`);
       },
     });
   }
@@ -33,7 +34,10 @@ class Api {
           opts
         )}`
       );
-      return await this.api.get(route, opts);
+      return await this.api.get(route, {
+        ...opts,
+        "axios-retry": { retries: 3 },
+      });
     } catch (error) {
       this.logger.error("Произошла ошибка при обращении в API (get): " + error);
       throw error;
