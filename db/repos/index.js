@@ -1,4 +1,6 @@
 module.exports = {
   PaidStorage: require("./paidStorage"),
-  // AdStats: require("./adStats"),
+  AdStats: require("./adStats"),
+  Settings: require("./settings"),
+  FinReport: require("./finReport"),
 };
