@@ -2,10 +2,10 @@ const Api = require("../api");
 const timeout = require("../../utils/timeout");
 
 class FinReport extends Api {
-  constructor({ logger, config, db }) {
+  constructor({ logger, config, db, url }) {
     super({
       logger,
-      API_BASE_URL: config.SELLER_ANALYTICS_URL,
+      API_BASE_URL: url,
       API_KEY: config.API_KEY,
     });
     this.logger = logger;
@@ -13,52 +13,32 @@ class FinReport extends Api {
     this.db = db.FinReport;
   }
 
-  async createReport(dateFrom, dateTo) {
-    this.logger.debug("createReport");
-    const reply = await super.get("/v1/paid_storage", {
+  async getReport({ startDate, endDate, rrdid }) {
+    this.logger.debug("getReport");
+    const reply = await super.get(`/v5/supplier/reportDetailByPeriod`, {
       params: {
-        dateFrom: dateFrom.toJSON(),
-        dateTo: dateTo.toJSON(),
+        dateFrom: startDate,
+        dateTo: endDate,
+        rrdid,
       },
     });
-    this.taskId = reply.data.data.taskId;
-  }
-
-  async checkReport() {
-    this.logger.debug("checkReport");
-    const reply = await super.get(
-      `/v1/paid_storage/tasks/${this.taskId}/status`
-    );
-    return reply.data.data.status === "done";
-  }
-
-  async getReport() {
-    this.logger.debug("getReport");
-    const reply = await super.get(
-      `/v1/paid_storage/tasks/${this.taskId}/download`
-    );
 
     return reply.data;
   }
 
-  async start(dateFrom, dateTo) {
-    await this.createReport(dateFrom, dateTo);
-    while (!(await this.checkReport())) {
-      await timeout(30 * 1000);
+  async start({ startDate, endDate }) {
+    let rrdid = 0;
+    let stop = false;
+    while (stop === false) {
+      const data = await this.getReport({ startDate, endDate, rrdid });
+      if (data.length === 0) stop = true;
+      else {
+        this.db.addQuery({ data });
+        rrdid = data.at(-1).rrd_id;
+      }
     }
-    const data = await this.getReport();
-
-    return this.parseData(data);
-  }
-
-  parseData(data) {
-    return data.map((item) => {
-      item.tariffFixDate =
-        item.tariffFixDate == "" ? undefined : item.tariffFixDate;
-      item.tariffLowerDate =
-        item.tariffLowerDate == "" ? undefined : item.tariffLowerDate;
-      return item;
-    });
+    await this.db.runQueries();
+    // return this.parseData(data);
   }
 }
 
