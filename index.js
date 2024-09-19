@@ -27,7 +27,7 @@ const updateEntity = async ({ elem, setting }) => {
       endDate: end_date,
     });
     await setting.updateDate({
-      data: { lastUpdDate: end_date, upd_table_id },
+      data: { lastUpdDate: new Date(), upd_table_id },
       cond: ["upd_table_id"],
     });
     await setting.insertLog({
