@@ -43,7 +43,7 @@ function createColumnsets(pgp) {
         { name: "upd_table_id" },
         { name: "is_error", cast: "boolean", prop: "isError" },
         { name: "error_text", prop: "errorText" },
-        { name: "error_date", cast: "date", prop: "errorDate" },
+        { name: "upd_date", cast: "date", prop: "updDate" },
       ],
       { table: tableLog }
     );

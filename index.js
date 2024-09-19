@@ -35,7 +35,7 @@ const updateEntity = async ({ elem, setting }) => {
         upd_table_id,
         isError: false,
         errorText: undefined,
-        errorDate: undefined,
+        updDate: start_date,
       },
     });
   } catch (err) {
@@ -44,7 +44,7 @@ const updateEntity = async ({ elem, setting }) => {
         upd_table_id,
         isError: true,
         errorText: err.message,
-        errorDate: start_date,
+        updDate: start_date,
       },
     });
   }
