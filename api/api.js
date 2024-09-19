@@ -15,16 +15,15 @@ class Api {
       responseEncoding: "utf8",
     };
     this.api = axios.create(opts);
-    axiosRetry(this.api, {
-      retries: 0,
-      // retryCondition: (error) => true,
-      retryDelay: (retryCount) => {
-        return retryCount * 10000;
-      },
+    this.retryConfig = {
+      retryCondition: (error) => true,
+      retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 10000),
       onRetry: (retryCount, err, conf) => {
         logger.info(`retry req: ${conf.url}, count: ${retryCount}`);
       },
-    });
+    };
+
+    axiosRetry(this.api, this.retryConfig);
   }
 
   async get(route, opts = {}) {
@@ -34,10 +33,7 @@ class Api {
           opts
         )}`
       );
-      return await this.api.get(route, {
-        ...opts,
-        "axios-retry": { retries: 3 },
-      });
+      return await this.api.get(route, { ...opts });
     } catch (error) {
       this.logger.error("Произошла ошибка при обращении в API (get): " + error);
       throw error;
