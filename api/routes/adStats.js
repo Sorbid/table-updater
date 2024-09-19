@@ -2,8 +2,8 @@ const Api = require("../api");
 const timeout = require("../../utils/timeout");
 
 class AdStats extends Api {
-  constructor({ logger, config, db }) {
-    super({ logger, API_BASE_URL: config.AD_URL, API_KEY: config.API_KEY });
+  constructor({ logger, config, db, url }) {
+    super({ logger, url, API_KEY: config.API_KEY });
     this.logger = logger;
     this.adType = {
       4: "кампания в каталоге",

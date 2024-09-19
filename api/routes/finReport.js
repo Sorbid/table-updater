@@ -5,7 +5,7 @@ class FinReport extends Api {
   constructor({ logger, config, db, url }) {
     super({
       logger,
-      API_BASE_URL: url,
+      url,
       API_KEY: config.API_KEY,
     });
     this.logger = logger;

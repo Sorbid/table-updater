@@ -2,10 +2,10 @@ const axios = require("axios");
 const axiosRetry = require("axios-retry").default;
 
 class Api {
-  constructor({ logger, API_BASE_URL, API_KEY }) {
+  constructor({ logger, url, API_KEY }) {
     this.logger = logger;
     const opts = {
-      baseURL: API_BASE_URL,
+      baseURL: url,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         Authorization: API_KEY,
