@@ -12,9 +12,9 @@ const start = async () => {
   logger.debug("Получение настроек");
   const settingData = await setting.select();
 
-  await Promise.all(
-    settingData.map(async (elem) => await updateEntity({ elem, setting }))
-  );
+  for (const elem of settingData) {
+    await updateEntity({ elem, setting });
+  }
   logger.info("Выполнение закончено");
 };
 
