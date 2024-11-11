@@ -3,4 +3,5 @@ module.exports = {
   AdStats: require("./adStats"),
   Settings: require("./settings"),
   FinReport: require("./finReport"),
+  WarehouseRemains: require("./warehouseRemains"),
 };
