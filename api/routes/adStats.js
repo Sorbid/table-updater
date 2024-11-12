@@ -1,5 +1,4 @@
 const Api = require("../api");
-const timeout = require("../../utils/timeout");
 
 class AdStats extends Api {
   constructor({ logger, config, db, url }) {
@@ -33,7 +32,6 @@ class AdStats extends Api {
           },
         },
       ]);
-      console.log(reply.data);
 
       if (reply.data.length > 0) {
         const data = reply.data[0];
@@ -54,7 +52,7 @@ class AdStats extends Api {
     return reply.data;
   }
 
-  async start(begin, end) {
+  async start({ startDate, endDate }) {
     const ads = await this.getAllAdverts();
 
     const parsedAds = this.parseAdverts(ads);
@@ -62,8 +60,7 @@ class AdStats extends Api {
     let result = [];
 
     for (let item of parsedAds) {
-      result.push(await this.getStats(item, begin, end));
-      await timeout(61 * 1000);
+      result.push(await this.getStats(item, startDate, endDate));
     }
 
     await this.db.insert(this.parseResult(result));
