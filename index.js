@@ -3,7 +3,6 @@ const apis = require("./api");
 const config = require("./config");
 const logger = require("./utils/logger");
 const { db } = require("./db");
-// const dates = require("./utils/dates");
 
 const start = async () => {
   logger.info("Начало выполнения обновления");
