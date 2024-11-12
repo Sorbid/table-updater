@@ -19,6 +19,7 @@ class Api {
       retryCondition: (error) => true,
       retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 10000),
       onRetry: (retryCount, err, conf) => {
+        logger.warn(`error: ${err}`);
         logger.info(`retry req: ${conf.url}, count: ${retryCount}`);
       },
     };
