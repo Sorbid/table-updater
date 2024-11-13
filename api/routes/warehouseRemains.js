@@ -21,6 +21,13 @@ class WarehouseRemains extends Api {
         dateTo: dateTo,
         groupByNm: true,
         groupBySize: true,
+        locale: "ru",
+        groupByBrand: true,
+        groupBySubject: true,
+        groupBySa: true,
+        groupByBarcode: true,
+        filterPics: 0,
+        filterVolume: 0,
       },
     });
     this.taskId = reply.data.data.taskId;
