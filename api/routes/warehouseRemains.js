@@ -13,12 +13,10 @@ class WarehouseRemains extends Api {
     this.db = db.WarehouseRemains;
   }
 
-  async createReport(dateFrom, dateTo) {
+  async createReport() {
     this.logger.debug("createReport");
     const reply = await super.get("/v1/warehouse_remains", {
       params: {
-        dateFrom: dateFrom,
-        dateTo: dateTo,
         groupByNm: true,
         groupBySize: true,
         locale: "ru",
@@ -50,10 +48,10 @@ class WarehouseRemains extends Api {
     return reply.data;
   }
 
-  async start({ startDate, endDate }) {
+  async start() {
     this.logger.info("Начало обновления warehouseRemains");
 
-    await this.createReport(startDate, endDate);
+    await this.createReport();
 
     while (!(await this.checkReport())) {
       await timeout(5 * 1000);
