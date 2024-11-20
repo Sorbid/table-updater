@@ -16,10 +16,17 @@ class Api {
     };
     this.api = axios.create(opts);
     this.retryConfig = {
-      retryCondition: (error) => true,
+      retries: 3,
+      retryCondition: (error) => {
+        return (
+          axiosRetry.isNetworkError(error) ||
+          (error.response &&
+            [429, 500, 502, 503, 504].includes(error.response.status))
+        );
+      },
       retryDelay: (...arg) => axiosRetry.exponentialDelay(...arg, 10000),
       onRetry: (retryCount, err, conf) => {
-        logger.warn(`error: ${err}`);
+        logger.warn(`error: ${err}, ${err?.response?.data?.statusText}`);
         logger.info(`retry req: ${conf.url}, count: ${retryCount}`);
       },
     };
