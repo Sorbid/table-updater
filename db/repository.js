@@ -20,7 +20,7 @@ class Repository {
     }
   }
 
-  async rawInsert({ sql }) {
+  async runRawQuery({ sql }) {
     this.logger.debug(`Выполнение сырого insert запроса: ${sql}`);
     try {
       await this.db.none(sql);
@@ -32,6 +32,16 @@ class Repository {
 
   createInsertQuery({ data, cs }) {
     return this.pgp.helpers.insert(data, cs.insert);
+  }
+
+  createUpdateQuery({ data, cs }) {
+    this.logger.debug(
+      `Выполнение множественного update запроса: ${JSON.stringify(
+        data
+      )}; таблица: ${cs.update.table}`
+    );
+    const where = " where v.id = t.id";
+    return this.pgp.helpers.update(data, cs.update) + where;
   }
 
   async tx() {}
@@ -46,6 +56,22 @@ class Repository {
       " WHERE " + cond.map((item) => `${item} = $\{${item}\}`).join(" "),
       data
     );
+    const update = this.pgp.helpers.update(data, cs.update) + where;
+    try {
+      await this.db.none(update);
+    } catch (err) {
+      this.logger.error("Произошла ошибка в бд: " + err);
+      throw err;
+    }
+  }
+
+  async updateMulti({ data, cs }) {
+    this.logger.debug(
+      `Выполнение множественного update запроса: ${JSON.stringify(
+        data
+      )}; таблица: ${cs.update.table}`
+    );
+    const where = " where v.id = t.id";
     const update = this.pgp.helpers.update(data, cs.update) + where;
     try {
       await this.db.none(update);

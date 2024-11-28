@@ -20,7 +20,7 @@ class FinReportRepository extends Repository {
   }
 
   async runQueries() {
-    await Promise.all(this.queries.map((sql) => super.rawInsert({ sql })));
+    await Promise.all(this.queries.map((sql) => super.runRawQuery({ sql })));
   }
 }
 
