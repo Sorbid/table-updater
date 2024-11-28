@@ -3,4 +3,5 @@ module.exports = {
   AdStats: require("./adStats"),
   FinReport: require("./finReport"),
   WarehouseRemains: require("./warehouseRemains"),
+  ReturnClaims: require("./returnClaims"),
 };

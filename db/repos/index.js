@@ -4,4 +4,5 @@ module.exports = {
   Settings: require("./settings"),
   FinReport: require("./finReport"),
   WarehouseRemains: require("./warehouseRemains"),
+  ReturnClaims: require("./returnClaims"),
 };
