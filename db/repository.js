@@ -44,6 +44,15 @@ class Repository {
     return this.pgp.helpers.update(data, cs.update) + where;
   }
 
+  createUpsertQuery({ data, cs }) {
+    this.logger.debug(
+      `Выполнение множественного upsert запроса: ${JSON.stringify(
+        data
+      )}; таблица: ${cs.insert.table}`
+    );
+    return this.pgp.helpers.insert(data, cs.insert) + cs.onConflict;
+  }
+
   async tx() {}
 
   async update({ data, cs, cond }) {
@@ -59,6 +68,21 @@ class Repository {
     const update = this.pgp.helpers.update(data, cs.update) + where;
     try {
       await this.db.none(update);
+    } catch (err) {
+      this.logger.error("Произошла ошибка в бд: " + err);
+      throw err;
+    }
+  }
+
+  async upsert({ data, cs, cond }) {
+    this.logger.debug(
+      `Выполнение upsert запроса: ${JSON.stringify(data)}; таблица: ${
+        cs.insert.table
+      }; условие: ${cond}`
+    );
+    const upsert = createUpsertQuery({ data, cs });
+    try {
+      await this.db.none(upsert);
     } catch (err) {
       this.logger.error("Произошла ошибка в бд: " + err);
       throw err;
