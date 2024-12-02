@@ -30,21 +30,21 @@ class ReturnClaims extends Api {
   async start({ startDate, endDate }) {
     let offset = 0;
     let total = 0;
-    // do {
-    //   const data = await this.getReport({ is_archive: true, offset });
-    //   total = data.total;
-    //   offset += this.limit;
-    //   this.db.addInsertQuery({ data: data.claims });
-    // } while (total >= offset);
+    do {
+      const data = await this.getReport({ is_archive: true, offset });
+      total = data.total;
+      offset += this.limit;
+      if (data.claims.length) this.db.addUpsertQuery({ data: data.claims });
+    } while (total >= offset);
 
-    // await this.db.runQueries();
+    await this.db.runQueries();
 
     offset = 0;
     do {
       const data = await this.getReport({ is_archive: false, offset });
       total = data.total;
       offset += this.limit;
-      this.db.addInsertQuery({ data: data.claims });
+      if (data.claims.length) this.db.addUpsertQuery({ data: data.claims });
     } while (total >= offset);
 
     await this.db.runQueries();
