@@ -23,6 +23,10 @@ class ReturnClaimsRepository extends Repository {
     this.queries.push(super.createUpdateQuery({ data, cs }));
   }
 
+  addUpsertQuery({ data }) {
+    this.queries.push(super.createUpsertQuery({ data, cs }));
+  }
+
   async runQueries() {
     await Promise.all(this.queries.map((sql) => super.runRawQuery({ sql })));
   }
@@ -44,7 +48,7 @@ function createColumnsets(pgp) {
         { name: "nm_id" },
         { name: "user_comment" },
         { name: "wb_comment" },
-        { name: "dt" },
+        { name: "dt", cast: "timestamp" },
         { name: "imt_name" },
         { name: "order_dt", cast: "timestamp" },
         { name: "dt_update", cast: "timestamp" },
@@ -65,13 +69,13 @@ function createColumnsets(pgp) {
         { name: "nm_id" },
         { name: "user_comment" },
         { name: "wb_comment" },
-        { name: "dt" },
+        { name: "dt", cast: "timestamp" },
         { name: "imt_name" },
         { name: "order_dt", cast: "timestamp" },
         { name: "dt_update", cast: "timestamp" },
-        { name: "photos", mod: ":json" },
-        { name: "video_paths", mod: ":json" },
-        { name: "actions", mod: ":json" },
+        { name: "photos", cast: "jsonb", mod: ":json" },
+        { name: "video_paths", cast: "jsonb", mod: ":json" },
+        { name: "actions", cast: "jsonb", mod: ":json" },
         { name: "price" },
         { name: "currency_code" },
         {
@@ -84,6 +88,9 @@ function createColumnsets(pgp) {
       { table }
     );
   }
+  cs.onConflict =
+    " on conflict(id) do update set " +
+    cs.update.assignColumns({ from: "EXCLUDED", skip: ["id"] });
   return cs;
 }
 
