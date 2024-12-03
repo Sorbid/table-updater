@@ -6,4 +6,6 @@ module.exports = {
   WarehouseRemains: require("./warehouseRemains"),
   ReturnClaims: require("./returnClaims"),
   TariffBoxes: require("./tariffBoxes"),
+  Orders: require("./orders"),
+  ContentCards: require("./content"),
 };
