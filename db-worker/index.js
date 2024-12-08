@@ -1,30 +1,61 @@
-const pgPromise = require("pg-promise");
-const {
-  DB_HOST,
-  DB_PORT,
-  DB_DATABASE,
-  DB_USER,
-  DB_PASS,
-} = require("../config");
-const repos = require("./repos");
-const logger = require("../utils/logger");
+const RabbitMQ = require("./utils/amqp");
+const { db } = require("./db");
+const { FileHandler, checkFolder } = require("./utils/file");
+require("dotenv").config();
 
-const initOptions = {
-  extend(obj) {
-    Object.keys(repos).map(
-      (repo) => (obj[repo] = new repos[repo]({ logger, db: obj, pgp }))
-    );
-  },
-};
+class MainPackage {
+  constructor() {
+    this.folder = "./shared";
+    checkFolder(this.folder);
+  }
 
-const pgp = pgPromise(initOptions);
+  async init() {
+    this.rabbit = new RabbitMQ(process.env.RABBIT_URL);
+    try {
+      await this.rabbit.connect();
+      const queueName = "api-queue";
 
-const db = pgp({
-  host: DB_HOST,
-  port: DB_PORT,
-  database: DB_DATABASE,
-  user: DB_USER,
-  password: DB_PASS,
-});
+      await this.rabbit.consumeMessages(queueName, (message) => {
+        this.processMessage(message);
+      });
+    } catch (error) {
+      console.error("Error in RabbitMQ flow:", error);
+    }
+  }
 
-module.exports = { db, pgp };
+  async processMessage(message) {
+    const fileHandler = new FileHandler(this.folder);
+    try {
+      const payload = JSON.parse(message);
+      const { type, link, updTableId } = payload;
+
+      if (!type || !db[type]) {
+        throw new Error(`Нет реализации db для обработки: ${type}`);
+      }
+
+      if (!link) {
+        throw new Error("Нет ссылки для файла");
+      }
+
+      const result = await fileHandler.getFile(link);
+
+      await db[type].insert(result);
+
+      await sendToLog({ test: "check" });
+    } catch (err) {
+      await processError();
+    } finally {
+      fileHandler.unlinkFile();
+    }
+  }
+
+  async sendToLog(body) {
+    this.rabbit.sendMessage("log-queue", body);
+  }
+
+  async processError() {}
+}
+
+const main = new MainPackage();
+
+main.init();

@@ -1,16 +1,13 @@
-const Api = require("../api");
-const timeout = require("../../utils/timeout");
+const Api = require("./api");
 
 class ReturnClaims extends Api {
-  constructor({ logger, config, db, url }) {
+  constructor({ logger, url }) {
     super({
       logger,
       url,
-      API_KEY: config.API_KEY,
     });
     this.logger = logger;
     this.taskId = undefined;
-    this.db = db.ReturnClaims;
     this.limit = 50;
   }
 
@@ -30,12 +27,14 @@ class ReturnClaims extends Api {
   async start({ startDate, endDate }) {
     let offset = 0;
     let total = 0;
-    // do {
-    //   const data = await this.getReport({ is_archive: true, offset });
-    //   total = data.total;
-    //   offset += this.limit;
-    //   this.db.addInsertQuery({ data: data.claims });
-    // } while (total >= offset);
+    const result = [];
+
+    do {
+      const data = await this.getReport({ is_archive: true, offset });
+      total = data.total;
+      offset += this.limit;
+      result.push(data.claims);
+    } while (total >= offset);
 
     // await this.db.runQueries();
 
@@ -44,10 +43,10 @@ class ReturnClaims extends Api {
       const data = await this.getReport({ is_archive: false, offset });
       total = data.total;
       offset += this.limit;
-      this.db.addInsertQuery({ data: data.claims });
+      result.push(data.claims);
     } while (total >= offset);
 
-    await this.db.runQueries();
+    return result;
   }
 }
 

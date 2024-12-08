@@ -1,4 +1,4 @@
-const Repository = require("../repository");
+const Repository = require("./repository");
 const sql = require("../sql/sqlSettings");
 
 const cs = {};

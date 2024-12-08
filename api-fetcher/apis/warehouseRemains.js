@@ -1,16 +1,14 @@
-const Api = require("../api");
+const Api = require("./api");
 const timeout = require("../../utils/timeout");
 
 class WarehouseRemains extends Api {
-  constructor({ logger, config, db, url }) {
+  constructor({ logger, url }) {
     super({
       logger,
       url,
-      API_KEY: config.API_KEY,
     });
     this.logger = logger;
     this.taskId = undefined;
-    this.db = db.WarehouseRemains;
   }
 
   async createReport() {
@@ -56,16 +54,8 @@ class WarehouseRemains extends Api {
     while (!(await this.checkReport())) {
       await timeout(5 * 1000);
     }
-    const data = await this.getReport();
 
-    await this.insertData(data);
-
-    this.logger.info("Обновление warehouseRemains успешно завершено");
-  }
-
-  async insertData(data) {
-    this.logger.debug("insertData");
-    await this.db.insert(data);
+    return await this.getReport();
   }
 }
 

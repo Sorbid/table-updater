@@ -2,7 +2,8 @@ const amqplib = require("amqplib");
 const fp = require("fastify-plugin");
 
 module.exports = fp(async function (fastify, opts) {
-  const { queues, rabbitUrl } = opts;
+  const { RABBIT_URL } = fastify.config;
+  const queues = ["api-queue", "log-queue"];
 
   let connection;
   const channels = {};
@@ -34,7 +35,7 @@ module.exports = fp(async function (fastify, opts) {
 
   async function connect() {
     try {
-      connection = await amqplib.connect(url);
+      connection = await amqplib.connect(RABBIT_URL);
       for (const queue of queues) {
         const channel = await connection.createChannel();
         await channel.assertQueue(queue, { durable: true });

@@ -1,8 +1,8 @@
-const Api = require("../api");
+const Api = require("./api");
 
 class AdStats extends Api {
-  constructor({ logger, config, db, url }) {
-    super({ logger, url, API_KEY: config.API_KEY });
+  constructor({ logger, url }) {
+    super({ logger, url });
     this.logger = logger;
     this.adType = {
       4: "кампания в каталоге",
@@ -12,7 +12,6 @@ class AdStats extends Api {
       8: "автоматическая кампания",
       9: "поиск + каталог",
     };
-    this.db = db.AdStats;
   }
 
   async getAllAdverts() {
@@ -63,7 +62,7 @@ class AdStats extends Api {
       result.push(await this.getStats(item, startDate, endDate));
     }
 
-    await this.db.insert(this.parseResult(result));
+    return this.parseResult(result);
   }
 
   parseResult(res) {
