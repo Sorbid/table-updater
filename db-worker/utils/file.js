@@ -8,9 +8,9 @@ class FileHandler {
   }
 
   getFile(file) {
-    this.fullname = path.join(`${this.folder}/${file}`);
+    this.fullname = file;
 
-    checkFile();
+    this.checkFile();
 
     try {
       const content = fs.readFileSync(this.fullname, "utf-8");

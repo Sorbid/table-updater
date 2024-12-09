@@ -7,7 +7,7 @@ const {
   DB_PASS,
 } = require("../config");
 const repos = require("../repos");
-const logger = require("../../utils/logger");
+const logger = require("./logger");
 
 const initOptions = {
   extend(obj) {

@@ -1,5 +1,5 @@
 const RabbitMQ = require("./utils/amqp");
-const { db } = require("./db");
+const { db } = require("./utils/db");
 const { FileHandler, checkFolder } = require("./utils/file");
 require("dotenv").config();
 
@@ -10,10 +10,10 @@ class MainPackage {
   }
 
   async init() {
-    this.rabbit = new RabbitMQ(process.env.RABBIT_URL);
+    this.rabbit = new RabbitMQ("amqp://localhost");
     try {
       await this.rabbit.connect();
-      const queueName = "api-queue";
+      const queueName = "db-queue";
 
       await this.rabbit.consumeMessages(queueName, (message) => {
         this.processMessage(message);
@@ -27,19 +27,19 @@ class MainPackage {
     const fileHandler = new FileHandler(this.folder);
     try {
       const payload = JSON.parse(message);
-      const { type, link, updTableId } = payload;
+      const { repository, link, cronJobId } = payload;
 
-      if (!type || !db[type]) {
-        throw new Error(`Нет реализации db для обработки: ${type}`);
+      if (!repository || !db[repository]) {
+        throw new Error(`Нет реализации db для обработки: ${repository}`);
       }
 
       if (!link) {
         throw new Error("Нет ссылки для файла");
       }
 
-      const result = await fileHandler.getFile(link);
+      const result = fileHandler.getFile(link);
 
-      await db[type].insert(result);
+      await db[repository].insert(result);
 
       await sendToLog({ test: "check" });
     } catch (err) {
@@ -50,7 +50,7 @@ class MainPackage {
   }
 
   async sendToLog(body) {
-    this.rabbit.sendMessage("log-queue", body);
+    this.rabbit.sendMessage("log-queue", JSON.stringify(body));
   }
 
   async processError() {}

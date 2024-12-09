@@ -55,9 +55,9 @@ module.exports = fp(async function (fastify, opts) {
   }
 
   async function sendMessage(queue, message) {
-    const channel = channel[queue];
+    const channel = channels[queue];
     if (!channel) throw new Error(`Канал не инициилизирован: ${queue}`);
-    await channel.sendToQueue(queue, Buffer.from(message));
+    await channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
     fastify.log.debug(`Сообщение передано в ${queue}: ${message}`);
   }
 

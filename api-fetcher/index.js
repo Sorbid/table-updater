@@ -1,7 +1,7 @@
 const RabbitMQ = require("./utils/amqp");
 const apis = require("./apis");
 const logger = require("./utils/logger");
-const FileHandler = require("./utils/file");
+const { FileHandler } = require("./utils/file");
 require("dotenv").config();
 
 class MainPackage {
@@ -11,8 +11,7 @@ class MainPackage {
   }
 
   async init() {
-    checkFolder(this.folder);
-    this.rabbit = new RabbitMQ(process.env.RABBIT_URL);
+    this.rabbit = new RabbitMQ("amqp://localhost");
     try {
       await this.rabbit.connect();
       const queueName = "api-queue";
@@ -35,13 +34,13 @@ class MainPackage {
       }
 
       const { startDate, endDate, url } = params;
-      const instance = new apis[repository]({ logger, config, url });
+      const instance = new apis[repository]({ logger, url });
       const result = await instance.start({
         startDate,
         endDate,
       });
 
-      const link = await saveResultOnDisk(this.folder, result);
+      const link = await this.fileHandler.saveResultOnDisk(this.folder, result);
 
       await this.sendToDb({
         link,
@@ -54,7 +53,7 @@ class MainPackage {
   }
 
   async sendToDb(body) {
-    this.rabbit.sendMessage("db-queue", body);
+    this.rabbit.sendMessage("db-queue", JSON.stringify(body));
   }
 
   async processError() {}

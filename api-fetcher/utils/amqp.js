@@ -11,6 +11,7 @@ class RabbitMQ {
     try {
       this.connection = await amqp.connect(this.connectionString);
       this.channel = await this.connection.createChannel();
+      this.channel.prefetch(1);
       console.log("Connected to RabbitMQ");
     } catch (error) {
       console.error("Error connecting to RabbitMQ:", error);
@@ -30,6 +31,7 @@ class RabbitMQ {
 
   async sendMessage(queueName, message) {
     try {
+      await this.createQueue(queueName);
       this.channel.sendToQueue(queueName, Buffer.from(message), {
         persistent: true,
       });
@@ -42,12 +44,12 @@ class RabbitMQ {
 
   async consumeMessages(queueName, onMessage) {
     try {
-      await this.channel.consume(queueName, (msg) => {
+      await this.channel.consume(queueName, async (msg) => {
         if (msg !== null) {
           console.log(
             `Received message from queue "${queueName}": ${msg.content.toString()}`
           );
-          onMessage(msg.content.toString());
+          await onMessage(msg.content.toString());
           this.channel.ack(msg);
         }
       });

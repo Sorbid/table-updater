@@ -11,11 +11,29 @@ async function getCronConfig({ DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS }) {
   });
 
   try {
-    return await db.any("select * from app_updater.cron_jobs");
+    // return await db.any("select * from app_updater.cron_jobs");
+    return [
+      {
+        isEnabled: true,
+        name: "test",
+        schedule: "* * * * *",
+        repository: "ReturnClaims",
+        idCronJob: 1,
+        url: "https://returns-api.wildberries.ru/api/",
+      },
+      {
+        isEnabled: false,
+        name: "test",
+        schedule: "* * * * *",
+        repository: "returnClaims",
+        idCronJob: 1,
+        url: "https://returns-api.wildberries.ru/api/",
+      },
+    ];
   } catch (err) {
     logger.error("Ошибка на стороне драйвера pg: " + err);
   } finally {
-    pgp.end;
+    pgp.end();
   }
 }
 
