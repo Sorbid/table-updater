@@ -1,24 +1,28 @@
-const RabbitMQ = require("./utils/amqp");
+const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const apis = require("./apis");
-const logger = require("./utils/logger");
-const { FileHandler } = require("./utils/file");
 require("dotenv").config();
 
 class MainPackage {
   constructor() {
     this.folder = "./shared";
+    const loggerInstance = new Logger();
+    this.logger = loggerInstance.init({
+      name: "api-fetcher",
+      level: "debug",
+    });
+    this.queueName = "api-queue";
     this.fileHandler = new FileHandler(this.folder);
+    this.rabbit = new RabbitMq({
+      connectionString: "amqp://localhost",
+      logger: this.logger,
+    });
   }
 
   async init() {
-    this.rabbit = new RabbitMQ("amqp://localhost");
     try {
       await this.rabbit.connect();
-      const queueName = "api-queue";
-
-      await this.rabbit.consumeMessages(queueName, (message) => {
-        this.processMessage(message);
-      });
+      await this.rabbit.initChannelForQueue(this.queueName, { prefetch: 1 });
+      await this.rabbit.consumeMessages(this.queueName, this.processMessage);
     } catch (error) {
       console.error("Error in RabbitMQ flow:", error);
     }
@@ -59,8 +63,17 @@ class MainPackage {
   }
 
   async processError() {}
+
+  async cleanup() {
+    await this.rabbit.close();
+  }
 }
 
 const main = new MainPackage();
 
 main.init();
+
+process.on("SIGINT", async () => {
+  await main.cleanup();
+  process.exit(0);
+});

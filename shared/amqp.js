@@ -6,7 +6,7 @@ class RabbitMq {
     this.connectionString = connectionString;
     this.logger = logger;
     this.connection = null;
-    this.channel = null;
+    this.channel = {};
     this.onClose = onClose;
     this.onError = onError;
   }
@@ -20,18 +20,18 @@ class RabbitMq {
       throw new Error("Logger не инициализирован");
     }
 
-    if (typeof onClose !== "function") {
+    if (onClose && typeof onClose !== "function") {
       throw new Error("onClose не является функцией");
     }
 
-    if (typeof onError !== "function") {
+    if (onError && typeof onError !== "function") {
       throw new Error("onError не является функцией");
     }
   }
 
   setupHandlers() {
-    this.connection.on("close", this.onClose);
-    this.connection.on("error", this.onError);
+    if (this.onClose) this.connection.on("close", this.onClose);
+    if (this.onError) this.connection.on("error", this.onError);
   }
 
   async connect() {
@@ -51,7 +51,7 @@ class RabbitMq {
 
     this.channel[queueName] = await this.connection.createChannel();
 
-    if (opts.prefetch) this.channel[queueName].prefetch(opts.prefetch);
+    if (opts?.prefetch) this.channel[queueName].prefetch(opts.prefetch);
 
     this.logger.info(
       `Канал для ${queueName} инициализирован: ${JSON.stringify(opts)}`
@@ -73,7 +73,7 @@ class RabbitMq {
 
   async sendMessage(queueName, message) {
     try {
-      await this.createQueue(queueName);
+      // await this.createQueue(queueName);
       this.channel[queueName].sendToQueue(queueName, Buffer.from(message), {
         persistent: true,
       });
@@ -107,7 +107,7 @@ class RabbitMq {
   async close() {
     try {
       for (const channel of this.channel) {
-        channel.close();
+        await this.channel[channel].close();
       }
       await this.connection.close();
       this.logger.info("Connection to RabbitMQ closed.");

@@ -1,85 +1,36 @@
-const amqplib = require("amqplib");
+const { RabbitMq } = require("@laretto/raw-data-lib");
 const fp = require("fastify-plugin");
 
 module.exports = fp(async function (fastify, opts) {
   const { RABBIT_URL } = fastify.config;
   const queues = ["api-queue", "log-queue"];
 
-  let connection;
-  const channels = {};
-  let maxTries = 5;
-  let reconnectTries = 0;
+  const onError = function (err) {
+    fastify.log.error(`Произошла ошибка на стороне rabbitmq: ${err.message}`);
+  };
 
-  function setupRabbitHandlers() {
-    connection.on("close", async () => {
-      if (reconnectTries >= maxTries) {
-        fastify.log.fatal(
-          "Максимальное количество переподключений, отключение сервера"
-        );
-        fastify.close();
-      }
-      fastify.log.warn("Попытка реконнекта...");
-      reconnectTries++;
-      for (const queueName in channels) {
-        if (channels[queueName]) await channels[queueName].close();
-      }
-      if (connection) await connection.close();
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      await connect();
-    });
+  const amqp = new RabbitMq({
+    connectionString: RABBIT_URL,
+    logger: fastify.log,
+    onError,
+  });
 
-    connection.on("error", async (err) => {
-      fastify.log.error(`Произошла ошибка на стороне rabbitmq: ${err.message}`);
-    });
+  await amqp.connect();
+
+  for (const queue of queues) {
+    await amqp.initChannelForQueue(queue);
+    fastify.log.info(`Создан канал для подключения к очереди: ${queue}`);
   }
 
-  async function connect() {
-    try {
-      connection = await amqplib.connect(RABBIT_URL);
-      for (const queue of queues) {
-        const channel = await connection.createChannel();
-        await channel.assertQueue(queue, { durable: true });
-        channels[queue] = channel;
-        fastify.log.info(`Создан канал для подключения к очереди: ${queue}`);
-      }
-      fastify.log.info("Подключение к RabbitMQ установлено");
-      reconnectTries = 0;
-
-      setupRabbitHandlers();
-    } catch (err) {
-      fastify.log.error(
-        `Ошибка при открытии соединения с RabbitMQ: ${err.message}`
-      );
-      throw err;
-    }
-  }
+  fastify.log.info("Подключение к RabbitMQ установлено");
 
   async function sendMessage(queue, message) {
-    const channel = channels[queue];
-    if (!channel) throw new Error(`Канал не инициилизирован: ${queue}`);
-    await channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
-    fastify.log.debug(`Сообщение передано в ${queue}: ${message}`);
-  }
-
-  async function closeConnection() {
-    try {
-      for (const queueName in channels) {
-        if (channels[queueName]) await channels[queueName].close();
-      }
-      if (connection) await connection.close();
-      fastify.log.info("Подключение к RabbitMQ закрыто");
-    } catch (err) {
-      fastify.log.error(
-        `Ошибка при закрытии соединения с RabbitMQ: ${err.message}`
-      );
-    }
+    await amqp.sendMessage(queue, JSON.stringify(message));
   }
 
   fastify.addHook("onClose", async () => {
-    await closeConnection();
+    await amqp.close();
   });
-
-  await connect();
 
   fastify.decorate("rabbitmq", { sendMessage });
 });
