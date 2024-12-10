@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.10.5",
+    "@laretto/raw-data-lib": "file:../shared",
     "axios": "^1.7.8",
     "axios-retry": "^4.5.0",
     "dotenv": "^16.4.7",

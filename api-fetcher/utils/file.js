@@ -12,9 +12,14 @@ class FileHandler {
       const filename = this.generateFileName();
       const fullname = `${this.folder}/${filename}`;
 
-      fs.writeFileSync(fullname, file);
+      return new Promise((resolve, reject) => {
+        const writeStream = fs.createWriteStream(fullname);
 
-      return fullname;
+        writeStream.write(JSON.stringify(file));
+
+        writeStream.end(() => resolve(fullname));
+        writeStream.on("error", reject);
+      });
     } catch (error) {
       throw new Error("Ошибка при записи файла");
     }

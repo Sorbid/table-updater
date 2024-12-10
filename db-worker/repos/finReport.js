@@ -28,7 +28,7 @@ function createColumnsets(pgp) {
   if (!cs.insert) {
     const table = new pgp.helpers.TableName({
       table: "fin_report",
-      schema: "public",
+      schema: process.env.DB_SCHEMA,
     });
 
     cs.insert = new pgp.helpers.ColumnSet(

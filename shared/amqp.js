@@ -1,6 +1,6 @@
 const amqp = require("amqplib");
 
-class RabbitMQ {
+class RabbitMq {
   constructor(connectionString) {
     this.connectionString = connectionString;
     this.connection = null;
@@ -31,6 +31,7 @@ class RabbitMQ {
 
   async sendMessage(queueName, message) {
     try {
+      await this.createQueue(queueName);
       this.channel.sendToQueue(queueName, Buffer.from(message), {
         persistent: true,
       });
@@ -71,4 +72,4 @@ class RabbitMQ {
   }
 }
 
-module.exports = RabbitMQ;
+module.exports = RabbitMq;

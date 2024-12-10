@@ -40,7 +40,9 @@ class MainPackage {
         endDate,
       });
 
-      const link = await this.fileHandler.saveResultOnDisk(this.folder, result);
+      //TODO: реализовать батч сохранение потоком
+
+      const link = await this.fileHandler.saveResultOnDisk(result);
 
       await this.sendToDb({
         link,

@@ -1,16 +1,19 @@
-const RabbitMQ = require("./utils/amqp");
+const RabbitMQ = require("../shared/amqp");
 const { db } = require("./utils/db");
-const { FileHandler, checkFolder } = require("./utils/file");
+const { FileHandler, checkFolder } = require("../shared/fileHandler");
+const logger = require("./utils/logger");
+
 require("dotenv").config();
 
 class MainPackage {
   constructor() {
     this.folder = "./shared";
     checkFolder(this.folder);
+    this.logger = logger;
   }
 
   async init() {
-    this.rabbit = new RabbitMQ("amqp://localhost");
+    this.rabbit = new RabbitMQ("amqp://localhost", this.logger);
     try {
       await this.rabbit.connect();
       const queueName = "db-queue";
@@ -25,10 +28,10 @@ class MainPackage {
 
   async processMessage(message) {
     const fileHandler = new FileHandler(this.folder);
-    try {
-      const payload = JSON.parse(message);
-      const { repository, link, cronJobId } = payload;
+    const payload = JSON.parse(message);
+    const { repository, link, cronJobId } = payload;
 
+    try {
       if (!repository || !db[repository]) {
         throw new Error(`Нет реализации db для обработки: ${repository}`);
       }
@@ -36,20 +39,20 @@ class MainPackage {
       if (!link) {
         throw new Error("Нет ссылки для файла");
       }
+      //TODO: Реализовать батч вставку потоком
 
-      const result = fileHandler.getFile(link);
+      const result = await fileHandler.getFile(link);
 
       await db[repository].insert(result);
 
-      await sendToLog({ test: "check" });
-    } catch (err) {
-      await processError();
-    } finally {
+      this.sendToLog({ cronJobId, repository, status: 0 });
       fileHandler.unlinkFile();
+    } catch (err) {
+      await processError(repository);
     }
   }
 
-  async sendToLog(body) {
+  sendToLog(body) {
     this.rabbit.sendMessage("log-queue", JSON.stringify(body));
   }
 
