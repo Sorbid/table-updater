@@ -9,9 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.10.5",
-    "dotenv": "^16.4.5",
-    "pg-promise": "^11.10.2",
-    "pino": "^9.5.0"
+    "@laretto/raw-data-lib": "file:../shared",
+    "pg-promise": "^11.10.2"
   }
 }

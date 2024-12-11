@@ -3,13 +3,13 @@ const path = require("path");
 
 class FileHandler {
   constructor(folder) {
-    this.checkFolder(folder);
     this.folder = folder;
+    this.checkFolder();
   }
 
-  checkFolder(folder) {
-    if (!fs.existsSync(folder))
-      throw new Error("Не инициализирован volume под папку " + folder);
+  checkFolder() {
+    if (!fs.existsSync(this.folder))
+      throw new Error("Не инициализирован volume под папку " + this.folder);
   }
 
   getFile(fullpath) {

@@ -1,10 +1,11 @@
 const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const apis = require("./apis");
-require("dotenv").config();
+
+const SHARED_FOLDER = "./shared";
 
 class MainPackage {
   constructor() {
-    this.folder = "./shared";
+    this.folder = SHARED_FOLDER;
     const loggerInstance = new Logger();
     this.logger = loggerInstance.init({
       name: "api-fetcher",
@@ -22,23 +23,25 @@ class MainPackage {
     try {
       await this.rabbit.connect();
       await this.rabbit.initChannelForQueue(this.queueName, { prefetch: 1 });
-      await this.rabbit.consumeMessages(this.queueName, this.processMessage);
+      await this.rabbit.consumeMessages(
+        this.queueName,
+        async (message) => await this.processMessage(message)
+      );
     } catch (error) {
       console.error("Error in RabbitMQ flow:", error);
     }
   }
 
   async processMessage(message) {
+    const payload = JSON.parse(message);
+    const { repository, params, cronJobId } = payload;
     try {
-      const payload = JSON.parse(message);
-      const { repository, params, cronJobId } = payload;
-
       if (!repository || !apis[repository]) {
         throw new Error(`Нет реализации api для загрузки: ${repository}`);
       }
 
       const { startDate, endDate, url } = params;
-      const instance = new apis[repository]({ logger, url });
+      const instance = new apis[repository]({ logger: this.logger, url });
       const result = await instance.start({
         startDate,
         endDate,
@@ -54,7 +57,12 @@ class MainPackage {
         cronJobId,
       });
     } catch (err) {
-      await this.processError();
+      await processError({ repository, cronJobId, err });
+
+      const message = `Ошибка при обработке сообщения: ${err.message},
+      ${JSON.stringify(params)}`;
+      this.logger.error(message);
+      throw new Error(message);
     }
   }
 
@@ -62,7 +70,9 @@ class MainPackage {
     this.rabbit.sendMessage("db-queue", JSON.stringify(body));
   }
 
-  async processError() {}
+  async processError({ repository, cronJobId, err }) {
+    sendToLog({ repository, cronJobId, err: err.message });
+  }
 
   async cleanup() {
     await this.rabbit.close();

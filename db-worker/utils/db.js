@@ -7,24 +7,39 @@ const {
   DB_PASS,
 } = require("../config");
 const repos = require("../repos");
-const logger = require("./logger");
 
-const initOptions = {
-  extend(obj) {
-    Object.keys(repos).map(
-      (repo) => (obj[repo] = new repos[repo]({ logger, db: obj, pgp }))
-    );
-  },
-};
+class Db {
+  constructor({ logger }) {
+    this.db = undefined;
+    this.pgp = undefined;
+    this.logger = logger;
+  }
 
-const pgp = pgPromise(initOptions);
+  init() {
+    const logger = this.logger;
+    const initOptions = {
+      extend(obj) {
+        Object.keys(repos).map(
+          (repo) => (obj[repo] = new repos[repo]({ logger, db: obj, pgp }))
+        );
+      },
+    };
 
-const db = pgp({
-  host: DB_HOST,
-  port: DB_PORT,
-  database: DB_DATABASE,
-  user: DB_USER,
-  password: DB_PASS,
-});
+    const pgp = pgPromise(initOptions);
 
-module.exports = { db, pgp };
+    const db = pgp({
+      host: DB_HOST,
+      port: DB_PORT,
+      database: DB_DATABASE,
+      user: DB_USER,
+      password: DB_PASS,
+    });
+
+    this.db = db;
+    this.pgp = pgp;
+
+    return this.db;
+  }
+}
+
+module.exports = Db;

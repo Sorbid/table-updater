@@ -6,13 +6,13 @@ class Logger {
   }
 
   init(opts) {
-    if (this.logger)
+    if (!this.logger)
       this.logger = pino({
+        ...opts,
         name: opts?.name,
         level: opts?.level || "info",
         base: undefined,
         timestamp: pino.stdTimeFunctions.isoTime,
-        ...opts,
       });
 
     return this.logger;

@@ -2,8 +2,10 @@ const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const Db = require("./utils/db");
 
 const SHARED_FOLDER = "./shared";
-const DB_QUEUE = "db-queue";
 const LOG_QUEUE = "log-queue";
+const APP_NAME = "db-worker";
+const LOGGER_LEVEL = "debug";
+const RABBIT_URL = "amqp://localhost";
 
 class MainPackage {
   constructor() {
@@ -12,11 +14,11 @@ class MainPackage {
 
     const loggerInstance = new Logger();
     this.logger = loggerInstance.init({
-      name: "db-worker",
-      level: "debug",
+      name: APP_NAME,
+      level: LOGGER_LEVEL,
     });
     this.rabbit = new RabbitMq({
-      connectionString: "amqp://localhost",
+      connectionString: RABBIT_URL,
       logger: this.logger,
     });
   }
@@ -29,7 +31,7 @@ class MainPackage {
   async initRabbit() {
     try {
       await this.rabbit.connect();
-      const queueName = DB_QUEUE;
+      const queueName = LOG_QUEUE;
 
       await this.rabbit.consumeMessages(queueName, (message) => {
         this.processMessage(message);
@@ -46,38 +48,17 @@ class MainPackage {
 
   async processMessage(message) {
     const payload = JSON.parse(message);
-    const { repository, link, cronJobId } = payload;
+    const { cronJobId, repository, isError, message } = payload;
 
     try {
-      if (!repository || !this.db[repository]) {
-        throw new Error(`Нет реализации db для обработки: ${repository}`);
-      }
-
-      if (!link) {
-        throw new Error("Нет ссылки для файла");
-      }
-      //TODO: Реализовать батч вставку потоком
-
-      const result = await this.fileHandler.getFile(link);
-
       await this.db[repository].insert(result);
-
-      this.sendToLog({ cronJobId, repository, isError, message: null });
-      this.fileHandler.unlinkFile(link);
     } catch (err) {
-      await processError({ repository, cronJobId, err, isError });
-      const message = "Ошибка при обработке сообщения: " + err.message;
+      const message = `Ошибка при обработке сообщения: ${err.message};
+      ${JSON.stringify(payload)}`;
+
       this.logger.error(message);
       throw new Error(message);
     }
-  }
-
-  sendToLog(body) {
-    this.rabbit.sendMessage(LOG_QUEUE, JSON.stringify(body));
-  }
-
-  async processError({ repository, cronJobId, err, isError }) {
-    sendToLog({ repository, cronJobId, message: err.message, isError });
   }
 
   async cleanup() {

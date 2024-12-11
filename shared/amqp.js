@@ -16,7 +16,7 @@ class RabbitMq {
       throw new Error("Строка подключения для Rabbitmq не корректна");
     }
 
-    if (!logger.info || !logger.debug || !logger.error) {
+    if (!logger || !logger.info || !logger.debug || !logger.error) {
       throw new Error("Logger не инициализирован");
     }
 
@@ -60,7 +60,8 @@ class RabbitMq {
 
   async createQueue(queueName) {
     try {
-      if (!this.channel[queueName]) this.initChannelForQueue(queueName, {});
+      if (!this.channel[queueName])
+        await this.initChannelForQueue(queueName, {});
 
       await this.channel[queueName].assertQueue(queueName, { durable: true });
 
@@ -73,7 +74,7 @@ class RabbitMq {
 
   async sendMessage(queueName, message) {
     try {
-      // await this.createQueue(queueName);
+      if (!this.channel[queueName]) await this.createQueue(queueName);
       this.channel[queueName].sendToQueue(queueName, Buffer.from(message), {
         persistent: true,
       });
@@ -89,13 +90,17 @@ class RabbitMq {
       await this.createQueue(queueName);
 
       await this.channel[queueName].consume(queueName, async (msg) => {
-        if (msg === null)
-          throw new Error(`Пустое сообщение в очереди ${queueName}`);
-        this.logger.debug(
-          `Received message from queue "${queueName}": ${msg.content.toString()}`
-        );
-        await onMessage(msg.content.toString());
-        this.channel.ack(msg);
+        try {
+          if (msg === null)
+            throw new Error(`Пустое сообщение в очереди ${queueName}`);
+          this.logger.debug(
+            `Received message from queue "${queueName}": ${msg.content.toString()}`
+          );
+          await onMessage(msg.content.toString());
+          this.channel[queueName].ack(msg);
+        } catch (err) {
+          this.channel[queueName].nack(msg);
+        }
       });
       this.logger.info(`Started consuming messages from queue "${queueName}".`);
     } catch (error) {
