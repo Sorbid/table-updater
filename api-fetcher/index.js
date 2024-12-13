@@ -53,11 +53,17 @@ class MainPackage {
 
       await this.sendToDb({
         link,
+        updDate: params.startDate,
         repository,
         cronJobId,
       });
     } catch (err) {
-      await processError({ repository, cronJobId, err });
+      await this.processError({
+        updDate: params.startDate,
+        cronJobId,
+        isError,
+        err,
+      });
 
       const message = `Ошибка при обработке сообщения: ${err.message},
       ${JSON.stringify(params)}`;
@@ -70,8 +76,8 @@ class MainPackage {
     this.rabbit.sendMessage("db-queue", JSON.stringify(body));
   }
 
-  async processError({ repository, cronJobId, err }) {
-    sendToLog({ repository, cronJobId, err: err.message });
+  async processError({ updDate, cronJobId, isError, err }) {
+    sendToLog({ updDate, cronJobId, isError, errMessage: err.message });
   }
 
   async cleanup() {

@@ -46,7 +46,7 @@ class MainPackage {
 
   async processMessage(message) {
     const payload = JSON.parse(message);
-    const { repository, link, cronJobId } = payload;
+    const { repository, link, cronJobId, updDate } = payload;
 
     try {
       if (!repository || !this.db[repository]) {
@@ -62,22 +62,32 @@ class MainPackage {
 
       await this.db[repository].insert(result);
 
-      this.sendToLog({ cronJobId, repository, isError, message: null });
+      await this.sendToLog({
+        cronJobId,
+        updDate,
+        isError: false,
+        errMessage: null,
+      });
       this.fileHandler.unlinkFile(link);
     } catch (err) {
-      await processError({ repository, cronJobId, err, isError });
+      await this.processError({ updDate, cronJobId, err, isError: true });
       const message = "Ошибка при обработке сообщения: " + err.message;
       this.logger.error(message);
-      throw new Error(message);
+      // throw new Error(message);
     }
   }
 
-  sendToLog(body) {
-    this.rabbit.sendMessage(LOG_QUEUE, JSON.stringify(body));
+  async sendToLog(body) {
+    await this.rabbit.sendMessage(LOG_QUEUE, JSON.stringify(body));
   }
 
-  async processError({ repository, cronJobId, err, isError }) {
-    sendToLog({ repository, cronJobId, message: err.message, isError });
+  async processError({ updDate, cronJobId, err, isError }) {
+    await this.sendToLog({
+      updDate,
+      cronJobId,
+      errMessage: err.message,
+      isError,
+    });
   }
 
   async cleanup() {

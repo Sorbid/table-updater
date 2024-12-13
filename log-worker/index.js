@@ -1,17 +1,14 @@
-const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
-const Db = require("./utils/db");
+const { RabbitMq, Logger } = require("@laretto/raw-data-lib");
+const { insertIntoLog } = require("./utils/db");
+const { DB_HOST, DB_USER, DB_PASS, DB_PORT, DB_BASE } = process.env;
 
-const SHARED_FOLDER = "./shared";
 const LOG_QUEUE = "log-queue";
-const APP_NAME = "db-worker";
+const APP_NAME = "log-worker";
 const LOGGER_LEVEL = "debug";
 const RABBIT_URL = "amqp://localhost";
 
 class MainPackage {
   constructor() {
-    this.folder = SHARED_FOLDER;
-    this.fileHandler = new FileHandler(this.folder);
-
     const loggerInstance = new Logger();
     this.logger = loggerInstance.init({
       name: APP_NAME,
@@ -24,7 +21,6 @@ class MainPackage {
   }
 
   async init() {
-    this.initDb();
     await this.initRabbit();
   }
 
@@ -41,17 +37,15 @@ class MainPackage {
     }
   }
 
-  initDb() {
-    const dbInstance = new Db({ logger: this.logger });
-    this.db = dbInstance.init();
-  }
-
   async processMessage(message) {
     const payload = JSON.parse(message);
-    const { cronJobId, repository, isError, message } = payload;
+    const { cronJobId, isError, errMessage, updDate } = payload;
 
     try {
-      await this.db[repository].insert(result);
+      await insertIntoLog(
+        { DB_HOST, DB_USER, DB_PASS, DB_PORT, DB_BASE },
+        { cronJobId, isError, errMessage, updDate, logger: this.logger }
+      );
     } catch (err) {
       const message = `Ошибка при обработке сообщения: ${err.message};
       ${JSON.stringify(payload)}`;

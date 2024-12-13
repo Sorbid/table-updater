@@ -9,7 +9,7 @@ const createConfig = ({ task, sendMessage }) => {
     onTick: () => {
       sendMessage("api-queue", {
         repository: task.repository,
-        cronJobId: task.idCronJob,
+        cronJobId: task.cronJobId,
         params: {
           startDate: getYesterdayDate(),
           endDate: getYesterdayDate(),

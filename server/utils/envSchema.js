@@ -3,11 +3,11 @@ module.exports = {
   required: [
     "RABBIT_URL",
     "NODE_ENV",
-    // "DB_HOST",
-    // "DB_USER",
-    // "DB_PASS",
-    // "DB_PORT",
-    // "DB_BASE",
+    "DB_HOST",
+    "DB_USER",
+    "DB_PASS",
+    "DB_PORT",
+    "DB_BASE",
   ],
   properties: {
     RABBIT_URL: {

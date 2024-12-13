@@ -1,7 +1,9 @@
 const pgp = require("pg-promise")();
-const logger = require("./logger");
 
-async function getCronConfig({ DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS }) {
+async function insertIntoLog(
+  { DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS },
+  { cronJobId, updDate, isError, errMessage, logger }
+) {
   const db = pgp({
     host: DB_HOST,
     port: DB_PORT,
@@ -11,22 +13,14 @@ async function getCronConfig({ DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS }) {
   });
 
   try {
-    // return await db.any("select * from app_updater.cron_jobs");
-    return [
-      {
-        isEnabled: true,
-        name: "test",
-        schedule: "* * * * *",
-        repository: "ReturnClaims",
-        idCronJob: 1,
-        url: "https://returns-api.wildberries.ru/api/",
-      },
-    ];
+    const payload = [cronJobId, isError, errMessage, updDate];
+    await db.any(
+      "insert into rawdata.logs (cron_job_id, is_error, error_text, upd_date) values ($1, $2, $3, $4)",
+      payload
+    );
   } catch (err) {
     logger.error("Ошибка на стороне драйвера pg: " + err);
-  } finally {
-    pgp.end();
   }
 }
 
-module.exports = { getCronConfig };
+module.exports = { insertIntoLog };

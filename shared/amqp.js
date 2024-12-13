@@ -111,7 +111,7 @@ class RabbitMq {
 
   async close() {
     try {
-      for (const channel of this.channel) {
+      for (const channel in this.channel) {
         await this.channel[channel].close();
       }
       await this.connection.close();
