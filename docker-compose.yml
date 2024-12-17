@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api-fetcher:
+    build:
+      context: .
+      dockerfile: ./api-fetcher/Dockerfile
+    environment:
+      - NODE_ENV=development
+  db-worker:
+    build:
+      context: .
+      dockerfile: ./db-worker/Dockerfile
+    environment:
+      - NODE_ENV=development
+  log-worker:
+    build:
+      context: .
+      dockerfile: ./log-worker/Dockerfile
+    environment:
+      - NODE_ENV=development
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    environment:
+      - NODE_ENV=development
+    ports:
+      - 3984:3000
