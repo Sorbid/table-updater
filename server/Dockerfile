@@ -9,5 +9,4 @@ ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 WORKDIR /src
 COPY --from=appbuild /src .
-EXPOSE 3100
 ENTRYPOINT ["node", "server.js"]

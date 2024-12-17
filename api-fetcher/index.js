@@ -1,7 +1,7 @@
 const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const apis = require("./apis");
 
-const SHARED_FOLDER = "./shared";
+const SHARED_FOLDER = "./tmp-files";
 
 class MainPackage {
   constructor() {

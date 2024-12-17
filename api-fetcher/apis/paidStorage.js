@@ -1,5 +1,5 @@
 const Api = require("./api");
-const timeout = require("../../utils/timeout");
+const timeout = require("../utils/timeout");
 
 class PaidStorage extends Api {
   constructor({ logger, url }) {
