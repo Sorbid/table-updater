@@ -6,9 +6,9 @@ RUN npm install
 COPY shared/ ./
 
 WORKDIR /src
-COPY db-worker/package.json .
+COPY log-worker/package.json .
 RUN npm install
-COPY db-worker/ ./
+COPY log-worker/ ./
 
 FROM node:22-alpine
 ENV TZ=Europe/Moscow

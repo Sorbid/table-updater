@@ -21,10 +21,9 @@ const createConfig = ({ task, sendMessage }) => {
 };
 
 module.exports = async function (fastify, opts) {
-  // Подключаем плагин fastify-cron
   await fastify.register(fastifyCron);
   const { sendMessage } = fastify.rabbitmq;
-  const cronConfig = await getCronConfig(fastify.config);
+  const cronConfig = await getCronConfig(fastify.config, fastify.log);
 
   // Регистрируем задачи из конфигурации
   cronConfig.forEach((task) => {

@@ -1,29 +1,101 @@
-version: '3.8'
+version: '3'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
+    networks:
+      - rd-network
+
   api-fetcher:
     build:
       context: .
       dockerfile: ./api-fetcher/Dockerfile
     environment:
-      - NODE_ENV=development
+      NODE_ENV: production
+      API_KEY: ${WB_API_KEY}
+      RABBIT_URL: amqp://rabbitmq
+    volumes:
+      - files:/tmp-files
+    networks:
+      - rd-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
   db-worker:
     build:
       context: .
       dockerfile: ./db-worker/Dockerfile
     environment:
-      - NODE_ENV=development
+      NODE_ENV: production
+      RABBIT_URL: amqp://rabbitmq
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_SCHEMA: ${DB_SCHEMA}
+    volumes:
+      - files:/tmp-files
+    networks:
+      - rd-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
   log-worker:
     build:
       context: .
       dockerfile: ./log-worker/Dockerfile
     environment:
-      - NODE_ENV=development
+      NODE_ENV: production
+      RABBIT_URL: amqp://rabbitmq
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_SCHEMA: ${DB_SCHEMA}
+    networks:
+      - rd-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
   server:
     build:
       context: .
       dockerfile: ./server/Dockerfile
     environment:
-      - NODE_ENV=development
+      NODE_ENV: production
+      RABBIT_URL: amqp://rabbitmq
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_SCHEMA: ${DB_SCHEMA}
     ports:
       - 3984:3000
+    networks:
+      - rd-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+        restart: true
+
+volumes:
+  files:
+  rabbitmq-data:
+
+networks:
+  rd-network:
+    driver: bridge

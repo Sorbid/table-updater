@@ -1,0 +1,23 @@
+name: CI/CD for Node.js Docker Compose App
+
+on:
+  push:
+    branches:
+      - server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /opt/loader
+            git pull origin server
+            docker-compose down
+            docker-compose up -d --build

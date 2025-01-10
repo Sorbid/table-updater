@@ -1,7 +1,7 @@
 const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const apis = require("./apis");
 
-const SHARED_FOLDER = "./tmp-files";
+const SHARED_FOLDER = "/tmp-files";
 
 class MainPackage {
   constructor() {
@@ -14,7 +14,7 @@ class MainPackage {
     this.queueName = "api-queue";
     this.fileHandler = new FileHandler(this.folder);
     this.rabbit = new RabbitMq({
-      connectionString: "amqp://localhost",
+      connectionString: process.env.RABBIT_URL,
       logger: this.logger,
     });
   }

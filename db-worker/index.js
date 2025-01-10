@@ -1,9 +1,10 @@
 const { RabbitMq, Logger, FileHandler } = require("@laretto/raw-data-lib");
 const Db = require("./utils/db");
 
-const SHARED_FOLDER = "./shared";
+const SHARED_FOLDER = "/tmp-files";
 const DB_QUEUE = "db-queue";
 const LOG_QUEUE = "log-queue";
+const LOG_LEVEL = "info";
 
 class MainPackage {
   constructor() {
@@ -13,10 +14,10 @@ class MainPackage {
     const loggerInstance = new Logger();
     this.logger = loggerInstance.init({
       name: "db-worker",
-      level: "debug",
+      level: LOG_LEVEL,
     });
     this.rabbit = new RabbitMq({
-      connectionString: "amqp://localhost",
+      connectionString: process.env.RABBIT_URL,
       logger: this.logger,
     });
   }

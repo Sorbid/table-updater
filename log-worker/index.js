@@ -5,7 +5,7 @@ const { DB_HOST, DB_USER, DB_PASS, DB_PORT, DB_BASE } = process.env;
 const LOG_QUEUE = "log-queue";
 const APP_NAME = "log-worker";
 const LOGGER_LEVEL = "debug";
-const RABBIT_URL = "amqp://localhost";
+const RABBIT_URL = process.env.RABBIT_URL;
 
 class MainPackage {
   constructor() {

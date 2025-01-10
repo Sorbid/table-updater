@@ -1,6 +1,9 @@
 const pgp = require("pg-promise")();
 
-async function getCronConfig({ DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS }) {
+async function getCronConfig(
+  { DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS },
+  logger
+) {
   const db = pgp({
     host: DB_HOST,
     port: DB_PORT,
