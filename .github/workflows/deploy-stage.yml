@@ -21,10 +21,10 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
             cd /opt/loader
             git pull origin server
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
