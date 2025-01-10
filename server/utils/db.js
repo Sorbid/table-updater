@@ -13,7 +13,7 @@ async function getCronConfig(
   });
 
   try {
-    return await db.any("select * from rawdata.jobs");
+    return await db.any("select * from app.jobs");
   } catch (err) {
     logger.error("Ошибка на стороне драйвера pg: " + err);
   } finally {
