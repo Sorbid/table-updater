@@ -19,7 +19,7 @@ function createColumnsets(pgp) {
   if (!cs.insert) {
     const table = new pgp.helpers.TableName({
       table: "paid_storage",
-      schema: process.env.DB_SCHEMA,
+      schema: "wb",
     });
 
     cs.insert = new pgp.helpers.ColumnSet(

@@ -40,7 +40,6 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_SCHEMA: ${DB_SCHEMA}
     volumes:
       - files:/tmp-files
     networks:
@@ -62,7 +61,6 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_SCHEMA: ${DB_SCHEMA}
     networks:
       - rd-network
     depends_on:
@@ -82,7 +80,6 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      DB_SCHEMA: ${DB_SCHEMA}
     ports:
       - 3984:3000
     networks:
