@@ -23,6 +23,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
+          envs: WB_API_KEY,DB_USER,DB_PORT,DB_PASS,DB_HOST,DB_DATABASE
           script: |
             cd /opt/loader
             git pull origin server
