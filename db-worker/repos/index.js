@@ -5,4 +5,7 @@ module.exports = {
   FinReport: require("./finReport"),
   WarehouseRemains: require("./warehouseRemains"),
   ReturnClaims: require("./returnClaims"),
+  TariffBoxes: require("./tariffBoxes"),
+  Orders: require("./orders"),
+  ContentCards: require("./content"),
 };
