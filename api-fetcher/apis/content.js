@@ -1,4 +1,4 @@
-const Api = require("../api");
+const Api = require("./api");
 
 class ContentCards extends Api {
   constructor({ logger, config, db, url }) {

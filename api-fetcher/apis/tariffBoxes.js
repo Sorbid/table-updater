@@ -1,5 +1,5 @@
-const Api = require("../api");
-const timeout = require("../../utils/timeout");
+const Api = require("./api");
+const timeout = require("../utils/timeout");
 
 class TariffBoxes extends Api {
   constructor({ logger, config, db, url }) {
