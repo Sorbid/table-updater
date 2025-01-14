@@ -13,6 +13,7 @@ services:
       - 15672:15672
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     networks:
       - rd-network
 
