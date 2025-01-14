@@ -1,16 +1,19 @@
 const pgp = require("pg-promise")();
 
+let db;
+
 async function insertIntoLog(
   { DB_HOST, DB_PORT, DB_BASE, DB_USER, DB_PASS },
   { cronJobId, updDate, isError, errMessage, logger }
 ) {
-  const db = pgp({
-    host: DB_HOST,
-    port: DB_PORT,
-    database: DB_BASE,
-    user: DB_USER,
-    password: DB_PASS,
-  });
+  if (!db)
+    db = pgp({
+      host: DB_HOST,
+      port: DB_PORT,
+      database: DB_BASE,
+      user: DB_USER,
+      password: DB_PASS,
+    });
 
   try {
     const payload = [cronJobId, isError, errMessage, updDate];
