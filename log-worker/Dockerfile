@@ -11,8 +11,9 @@ RUN npm install
 COPY log-worker/ ./
 
 FROM node:22-alpine
+RUN apk add --no-cache tzdata
 ENV TZ=Europe/Moscow
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+# RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
 WORKDIR /src
 COPY --from=appbuild /src /src
 COPY --from=appbuild /shared /shared
