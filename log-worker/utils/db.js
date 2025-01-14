@@ -15,7 +15,7 @@ async function insertIntoLog(
   try {
     const payload = [cronJobId, isError, errMessage, updDate];
     await db.any(
-      "insert into rawdata.logs (cron_job_id, is_error, error_text, upd_date) values ($1, $2, $3, $4)",
+      "insert into app.logs (cron_job_id, is_error, error_text, upd_date) values ($1, $2, $3, $4)",
       payload
     );
   } catch (err) {
