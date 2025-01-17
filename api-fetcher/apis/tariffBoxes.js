@@ -1,16 +1,13 @@
 const Api = require("./api");
-const timeout = require("../utils/timeout");
 
 class TariffBoxes extends Api {
-  constructor({ logger, config, db, url }) {
+  constructor({ logger, url }) {
     super({
       logger,
       url,
-      API_KEY: config.API_KEY,
     });
     this.logger = logger;
     this.taskId = undefined;
-    this.db = db.TariffBoxes;
   }
 
   async getReport(date) {
@@ -29,14 +26,7 @@ class TariffBoxes extends Api {
 
     const data = await this.getReport(endDate);
 
-    await this.insertData(this.parseData({ data, endDate }));
-
-    this.logger.info("Обновление paidStorage успешно завершено");
-  }
-
-  async insertData(data) {
-    this.logger.debug("insertData");
-    await this.db.insert(data);
+    return this.parseData({ data, endDate });
   }
 
   parseData({ data, endDate }) {

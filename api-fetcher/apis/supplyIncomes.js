@@ -1,6 +1,6 @@
 const Api = require("./api");
 
-class Orders extends Api {
+class SupplyIncomes extends Api {
   constructor({ logger, url }) {
     super({
       logger,
@@ -11,10 +11,9 @@ class Orders extends Api {
 
   async getReport({ startDate }) {
     this.logger.debug("getReport");
-    const reply = await super.get(`/v1/supplier/orders`, {
+    const reply = await super.get(`/v1/supplier/incomes`, {
       params: {
         dateFrom: startDate,
-        flag: 1,
       },
     });
 
@@ -26,4 +25,4 @@ class Orders extends Api {
   }
 }
 
-module.exports = Orders;
+module.exports = SupplyIncomes;

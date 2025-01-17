@@ -7,4 +7,5 @@ module.exports = {
   TariffBoxes: require("./tariffBoxes"),
   Orders: require("./orders"),
   ContentCards: require("./content"),
+  TrashCards: require("./trashCards"),
 };

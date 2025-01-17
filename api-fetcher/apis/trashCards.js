@@ -1,6 +1,6 @@
 const Api = require("./api");
 
-class ContentCards extends Api {
+class TrashCards extends Api {
   constructor({ logger, url }) {
     super({
       logger,
@@ -12,15 +12,12 @@ class ContentCards extends Api {
 
   async getReport({ updatedAt, nmID }) {
     this.logger.debug("getReport");
-    const reply = await super.post(`/content/v2/get/cards/list`, {
+    const reply = await super.post(`/content/v2/get/cards/trash`, {
       settings: {
         cursor: {
           limit: this.limit,
           updatedAt,
           nmID,
-        },
-        filter: {
-          withPhoto: -1,
         },
       },
     });
@@ -45,4 +42,4 @@ class ContentCards extends Api {
   }
 }
 
-module.exports = ContentCards;
+module.exports = TrashCards;

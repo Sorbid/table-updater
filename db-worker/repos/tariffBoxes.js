@@ -19,7 +19,7 @@ function createColumnsets(pgp) {
   if (!cs.insert) {
     const table = new pgp.helpers.TableName({
       table: "tariff_boxes",
-      schema: "public",
+      schema: "wb",
     });
 
     cs.insert = new pgp.helpers.ColumnSet(
