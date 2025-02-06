@@ -1,10 +1,11 @@
 const Api = require("./api");
 
 class NmReportDetail extends Api {
-  constructor({ logger, url }) {
+  constructor({ logger, url, marketplace }) {
     super({
       logger,
       url,
+      marketplace,
     });
     this.logger = logger;
   }

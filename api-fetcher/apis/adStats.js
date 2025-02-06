@@ -1,8 +1,8 @@
 const Api = require("./api");
 
 class AdStats extends Api {
-  constructor({ logger, url }) {
-    super({ logger, url });
+  constructor({ logger, url, marketplace }) {
+    super({ logger, url, marketplace });
     this.logger = logger;
     this.adType = {
       4: "кампания в каталоге",

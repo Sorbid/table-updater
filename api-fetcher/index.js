@@ -34,14 +34,18 @@ class MainPackage {
 
   async processMessage(message) {
     const payload = JSON.parse(message);
-    const { repository, params, cronJobId } = payload;
+    const { repository, params, cronJobId, marketplace, url } = payload;
     try {
       if (!repository || !apis[repository]) {
         throw new Error(`Нет реализации api для загрузки: ${repository}`);
       }
 
-      const { startDate, endDate, url } = params;
-      const instance = new apis[repository]({ logger: this.logger, url });
+      const { startDate, endDate } = params;
+      const instance = new apis[repository]({
+        logger: this.logger,
+        url,
+        marketplace,
+      });
       const result = await instance.start({
         startDate,
         endDate,

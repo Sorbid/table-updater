@@ -2,10 +2,11 @@ const Api = require("./api");
 const timeout = require("../utils/timeout");
 
 class FinReport extends Api {
-  constructor({ logger, url }) {
+  constructor({ logger, url, marketplace }) {
     super({
       logger,
       url,
+      marketplace,
     });
     this.logger = logger;
     this.taskId = undefined;

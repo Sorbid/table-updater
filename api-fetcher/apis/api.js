@@ -2,13 +2,27 @@ const axios = require("axios");
 const axiosRetry = require("axios-retry").default;
 
 class Api {
-  constructor({ logger, url }) {
+  constructor({ logger, url, marketplace }) {
     this.logger = logger;
+    let key = "";
+    switch (marketplace) {
+      case "wb":
+        key = process.env.WB_API_KEY;
+        break;
+      case "ozon":
+        key = process.env.OZON_API_KEY;
+        break;
+      case "yandex":
+        key = process.env.YANDEX_API_KEY;
+        break;
+      default:
+        throw new Error("Нет соответствия загрузчика ключу");
+    }
     const opts = {
       baseURL: url,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        Authorization: process.env.API_KEY,
+        Authorization: key,
       },
       timeout: 1000 * 60 * 1,
       responseType: "json",
