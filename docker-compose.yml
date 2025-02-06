@@ -23,7 +23,8 @@ services:
       dockerfile: ./api-fetcher/Dockerfile
     environment:
       NODE_ENV: production
-      API_KEY: ${WB_API_KEY}
+      WB_API_KEY: ${WB_API_KEY}
+      YANDEX_API_KEY: ${YANDEX_API_KEY}
       RABBIT_URL: amqp://rabbitmq
     volumes:
       - files:/tmp-files
