@@ -3,17 +3,28 @@ const { getCronConfig } = require("../utils/db");
 const { getYesterdayDate } = require("../utils/date");
 
 const createConfig = ({ task, sendMessage }) => {
+  const {
+    name,
+    schedule,
+    repository,
+    cronJobId,
+    marketplace,
+    url,
+    startDate,
+    endDate,
+  } = task;
   return {
-    name: task.name,
-    cronTime: task.schedule,
+    name,
+    cronTime: schedule,
     onTick: () => {
       sendMessage("api-queue", {
-        repository: task.repository,
-        cronJobId: task.cronJobId,
+        repository,
+        cronJobId,
+        marketplace,
+        url,
         params: {
-          startDate: getYesterdayDate(),
-          endDate: getYesterdayDate(),
-          url: task.url,
+          startDate: startDate || getYesterdayDate(),
+          endDate: endDate || getYesterdayDate(),
         },
       });
     },
