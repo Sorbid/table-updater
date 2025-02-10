@@ -41,7 +41,7 @@ class MainPackage {
       }
 
       const { startDate, endDate } = params;
-      const instance = new apis[repository]({
+      const instance = new apis[marketplace][repository]({
         logger: this.logger,
         url,
         marketplace,
