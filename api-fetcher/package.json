@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@laretto/raw-data-lib": "file:../shared",
-    "axios": "^1.7.8",
+    "axios": "^1.7.9",
     "axios-retry": "^4.5.0"
   },
   "devDependencies": {
