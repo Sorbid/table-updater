@@ -1,4 +1,4 @@
-const Api = require("./api");
+const Api = require("../api");
 
 class Warehouses extends Api {
   constructor({ logger, url, marketplace }) {

@@ -1,4 +1,4 @@
-const Api = require("./api");
+const Api = require("../api");
 
 class TrashCards extends Api {
   constructor({ logger, url, marketplace }) {
