@@ -45,8 +45,18 @@ function createColumnsets(pgp) {
         { name: "palletcount", prop: "palletCount" },
         { name: "originaldate", cast: "date", prop: "originalDate" },
         { name: "loyaltydiscount", prop: "loyaltyDiscount" },
-        { name: "tarifffixdate", cast: "date", prop: "tariffFixDate" },
-        { name: "tarifflowerdate", cast: "date", prop: "tariffLowerDate" },
+        {
+          name: "tarifffixdate",
+          cast: "date",
+          prop: "tariffFixDate",
+          def: undefined,
+        },
+        {
+          name: "tarifflowerdate",
+          cast: "date",
+          prop: "tariffLowerDate",
+          def: undefined,
+        },
       ],
       { table }
     );
