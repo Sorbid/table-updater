@@ -4,12 +4,16 @@
   "description": "worker to work with logs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --inspect=0.0.0.0:9229 index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@laretto/raw-data-lib": "file:../shared",
     "pg-promise": "^11.10.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
