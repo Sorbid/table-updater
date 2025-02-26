@@ -36,7 +36,7 @@ class MainPackage {
     const payload = JSON.parse(message);
     const { repository, params, cronJobId, marketplace, url } = payload;
     try {
-      if (!repository || !apis[repository]) {
+      if (!repository || !apis[marketplace][repository]) {
         throw new Error(`Нет реализации api для загрузки: ${repository}`);
       }
 
