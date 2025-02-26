@@ -48,7 +48,17 @@ class PaidStorage extends Api {
     while (!(await this.checkReport())) {
       await timeout(30 * 1000);
     }
-    return await this.getReport();
+    const data = await this.getReport();
+
+    return this.parseData(data);
+  }
+
+  parseData(data) {
+    return data.map((item) => {
+      item.tariffFixDate = item.tariffFixDate || undefined;
+      item.tariffLowerDate = item.tariffLowerDate || undefined;
+      return item;
+    });
   }
 }
 
